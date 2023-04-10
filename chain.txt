@@ -1,6 +1,8 @@
 chain description
-100
-160 100
+16
+160	16
+
+
 
 
 

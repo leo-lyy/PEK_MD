@@ -472,10 +472,16 @@ int main()
             rx[i]=0;
             ry[i]=0;
             rz[i]=0;
-            if(i%8==1||i%8==3||i%8==5||i%8==7)bone[n][i].type=1;
-            else if(i%8==2||i%8==6)bone[n][i].type=2;
-            else if(i%8==0)bone[n][i].type=3;
-            else bone[n][i].type=4;
+            int t=i+1;
+            if (t%8==1)bone[n][i].type=1;
+            if (t%2==0)bone[n][i].type=2;
+            if (t%8==3||t%8==7)bone[n][i].type=3;
+            if (t%8==5)bone[n][i].type=4;
+
+            // if(t%8==1||i%8==3||i%8==5||i%8==7)bone[n][i].type=1;
+            // else if(i%8==2||i%8==6)bone[n][i].type=2;
+            // else if(i%8==0)bone[n][i].type=3;
+            // else bone[n][i].type=4;
         }
     }
 
