@@ -39,6 +39,7 @@ int main()
 {
     srand(time(NULL)); // 初始化随机数种子
     int k,molatom=1,chainnum,id=0;
+    float xlo,xhi,ylo,yhi,zlo,zhi;
     double vecx,vecy,vecz,mx,my,mz;
     //read initial data from "xxx.dat"
     memset(chain_len,0,sizeof(chain_len));
@@ -48,8 +49,18 @@ int main()
         string xx;
         getline(infile,xx);
         infile>>natom;
-        for(int i =0;i<22;i++)getline(infile,xx);
-        for(long int i =1;i<=natom;i++)
+        for(int i =0;i<9;i++)getline(infile,xx);
+        infile>>xlo>>xhi;
+        getline(infile,xx);
+        infile>>ylo>>yhi;
+        getline(infile,xx);
+        infile>>zlo>>zhi;
+        getline(infile,xx);
+        for(int i =0;i<10;i++)
+        {
+            getline(infile,xx); 
+        }       
+        for(long int i = 1;i<=natom;i++)
         {
             
             infile>>k>>k;
@@ -63,9 +74,10 @@ int main()
             else
             {
                 molatom++;
-                chain_len[k]++;
+
             }
             infile>>bone[k][molatom].type>>bone[k][molatom].x>>bone[k][molatom].y>>bone[k][molatom].z;
+            chain_len[k]++;
             if(molatom%8==0)
             {
                 bonds+=17;
@@ -227,13 +239,25 @@ int main()
         }
 
     }
-    ofstream outfile("data.xyz"); 
+    ofstream outfile("unfolded.data"); 
+    outfile<<"# LAMMPS input data file"<<endl; 
     outfile<<natom<<"       atoms"<<endl;
     outfile<<bonds<<"       bonds"<<endl;
-    outfile<<angles<<"       angles"<<endl;
-    outfile<<dihedrals<<"       dihedrals"<<endl;
-    outfile<<impropers<<"       impropers"<<endl;
-    outfile<<endl<<"Atoms # molecular"<<endl<<endl;\
+    // outfile<<angles<<"       angles"<<endl;
+    // outfile<<dihedrals<<"       dihedrals"<<endl;
+    // outfile<<impropers<<"       impropers"<<endl;
+
+    outfile<<" 6 atom types"<<endl;
+    outfile<<" 4 bond types"<<endl;
+
+    outfile<<endl;
+    outfile<<xlo<<"     "<<xhi<<"       xlo     xhi"<<endl;
+    outfile<<ylo<<"     "<<yhi<<"       ylo     yhi"<<endl;
+    outfile<<zlo<<"     "<<zhi<<"       zlo     zhi"<<endl;
+    
+
+
+    outfile<<endl<<"Atoms # molecular"<<endl<<endl;
     long int count=0;
     for(int i=1;i<=chainnum;i++)
     {
@@ -267,35 +291,62 @@ int main()
                 outfile<<++count<<"       "<<i<<"       "<<bone[i][j].type<<"       "<<bone[i][j].x<<"      "<<bone[i][j].y<<"      "<<bone[i][j].z<<endl;
                 bone[i][j].id=count;
                 outfile<<++count<<"       "<<i<<"       "<<benc[i][pos].type<<"     "<<benc[i][pos].x<<"      "<<benc[i][pos].y<<"      "<<benc[i][pos].z<<endl;
-                benc[i][j].id=count;
+                benc[i][pos].id=count;
                 pos++;
             }
         }
     }
 
 
+
+
+
+    outfile<<endl<<"Bonds"<<endl<<endl;
+    count=0;
+    for(int i=1;i<=chainnum;i++)
+    {
+        int pos=0;
+        //outfile<<endl<<chain_len[i]<<endl;
+        for(int j=1;j<=chain_len[i];j++)
+        {
+            
+            if (j%8==0 && j!=chain_len[i])
+            {
+                outfile<<++count<<"     "<<"1"<<"       "<<bone[i][j].id<<"        "<<bone[i][j+1].id<<endl;       // C-O
+            }
+            else if (j%8==1)
+            {
+                outfile<<++count<<"     "<<"1"<<"       "<<bone[i][j].id<<"        "<<bone[i][j+1].id<<endl;       // O-C
+            }
+            else if (j%8==2 || j%8==6)
+            {
+                outfile<<++count<<"     "<<"2"<<"       "<<bone[i][j].id<<"        "<<benc[i][++pos].id<<endl;     // C-C (benzene)
+                outfile<<++count<<"     "<<"2"<<"       "<<bone[i][j].id<<"        "<<benc[i][++pos].id<<endl;
+                outfile<<++count<<"     "<<"2"<<"       "<<benc[i][pos-1].id<<"        "<<benc[i][pos+2].id<<endl;
+                outfile<<++count<<"     "<<"2"<<"       "<<benc[i][pos].id<<"        "<<benc[i][++pos].id<<endl;
+                outfile<<++count<<"     "<<"2"<<"       "<<benc[i][pos].id<<"        "<<bone[i][j+2].id<<endl;
+                outfile<<++count<<"     "<<"2"<<"       "<<benc[i][++pos].id<<"        "<<bone[i][j+2].id<<endl;
+                j++;
+            }
+            else if (j%8==4)
+            {
+                // outfile<<++count<<"     "<<"2"<<"       "<<benc[i][pos-1].id<<"         "<<bone[i][j].id<<endl;
+                // outfile<<++count<<"     "<<"2"<<"       "<<benc[i][pos].id<<"       "<<bone[i][j].id<<endl;
+                outfile<<++count<<"     "<<"3"<<"       "<<bone[i][j].id<<"        "<<bone[i][j+1].id<<endl;       // C-C
+            }
+            else if (j%8==5)
+            {
+                outfile<<++count<<"     "<<"4"<<"       "<<bone[i][j].id<<"        "<<benc[i][++pos].id<<endl;     // C=O
+                outfile<<++count<<"     "<<"3"<<"       "<<bone[i][j].id<<"        "<<bone[i][j+1].id<<endl;       // C-C
+            }
+
+
+        }
+    }
+
     /// To be finished... 
 
 
-    // cout<<endl<<"Bonds"<<endl;
-    // count=0;
-    // for(int i=1;i<=chainnum;i++)
-    // {
-    //     int pos=1;
-    //     //outfile<<endl<<chain_len[i]<<endl;
-    //     for(int j=1;j<=chain_len[i]+1;j++)
-    //     {
-            
-    //         int k=bone[i][j].type;
-    //         if (k==1)
-    //         {
-    //             outfile<<++count<<"     ";
-    //         }
-
-
-
-    //     }
-    // }
 
     outfile.close();
 }
