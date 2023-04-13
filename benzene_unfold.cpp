@@ -243,12 +243,14 @@ int main()
     outfile<<"# LAMMPS input data file"<<endl; 
     outfile<<natom<<"       atoms"<<endl;
     outfile<<bonds<<"       bonds"<<endl;
+    outfile<<angles<<"      angles"<<endl;
     // outfile<<angles<<"       angles"<<endl;
     // outfile<<dihedrals<<"       dihedrals"<<endl;
     // outfile<<impropers<<"       impropers"<<endl;
 
     outfile<<" 6 atom types"<<endl;
     outfile<<" 4 bond types"<<endl;
+    outfile<<" 3 angle types"<<endl;
 
     outfile<<endl;
     outfile<<xlo<<"     "<<xhi<<"       xlo     xhi"<<endl;
@@ -344,8 +346,47 @@ int main()
         }
     }
 
-    /// To be finished... 
 
+    outfile<<endl<<"Angles"<<endl<<endl;
+    count=0;
+    for (int i=1;i<=chainnum;i++)
+    {
+        int pos=0;
+        for(int j=1;j<=chain_len[i];j++)
+        {
+            if( j%8 == 0  &&  j != chain_len[i] )
+            {
+                outfile<<++count<<"     "<<"3"<<"       "<<bone[i][j].id<<"         "<<bone[i][j+1].id<<"       "<<bone[i][j+2].id<<endl;
+            }
+            else if(j%8==2 || j%8==6)
+            {
+                outfile<<++count<<"     "<<"1"<<"       "<<bone[i][j-1].id<<"         "<<bone[i][j].id<<"       "<<benc[i][++pos].id<<endl;
+                outfile<<++count<<"     "<<"1"<<"       "<<bone[i][j-1].id<<"         "<<bone[i][j].id<<"       "<<benc[i][pos+1].id<<endl;
+                outfile<<++count<<"     "<<"1"<<"       "<<benc[i][pos].id<<"         "<<bone[i][j].id<<"       "<<benc[i][pos+1].id<<endl;
+                outfile<<++count<<"     "<<"1"<<"       "<<bone[i][j].id<<"         "<<benc[i][pos].id<<"       "<<benc[i][pos+3].id<<endl;
+                outfile<<++count<<"     "<<"1"<<"       "<<bone[i][j].id<<"         "<<benc[i][pos+1].id<<"       "<<benc[i][pos+2].id<<endl;
+                outfile<<++count<<"     "<<"1"<<"       "<<benc[i][pos].id<<"         "<<benc[i][pos+3].id<<"       "<<bone[i][j+2].id<<endl;
+                outfile<<++count<<"     "<<"1"<<"       "<<benc[i][pos+1].id<<"         "<<benc[i][pos+2].id<<"       "<<bone[i][j+2].id<<endl;
+                outfile<<++count<<"     "<<"1"<<"       "<<benc[i][pos+3].id<<"         "<<bone[i][j+2].id<<"       "<<benc[i][pos+3].id<<endl;
+                if(j!=chain_len[i]-2)
+                {
+                    outfile<<++count<<"     "<<"1"<<"       "<<benc[i][pos+3].id<<"         "<<bone[i][j+2].id<<"       "<<bone[i][j+3].id<<endl;
+                    outfile<<++count<<"     "<<"1"<<"       "<<benc[i][pos+1].id<<"         "<<bone[i][j+2].id<<"       "<<bone[i][j+3].id<<endl;
+                }
+                
+                j+=1;
+                pos+=3;
+            }
+            else if (j%8==5)
+            {
+                outfile<<++count<<"     "<<"2"<<"       "<<bone[i][j-1].id<<"         "<<bone[i][j].id<<"       "<<bone[i][j+1].id<<endl;
+                outfile<<++count<<"     "<<"2"<<"       "<<bone[i][j-1].id<<"         "<<bone[i][j].id<<"       "<<benc[i][++pos].id<<endl;
+                outfile<<++count<<"     "<<"2"<<"       "<<bone[i][j+1].id<<"         "<<bone[i][j].id<<"       "<<benc[i][pos].id<<endl;
+            }
+        }
+    }
+        /// To be finished... 
+    
 
 
     outfile.close();
