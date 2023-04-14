@@ -43,7 +43,7 @@ int main()
     double vecx,vecy,vecz,mx,my,mz;
     //read initial data from "xxx.dat"
     memset(chain_len,0,sizeof(chain_len));
-    ifstream infile("fcc_unwrapped_coordinate.dat");
+    ifstream infile("skeleton.dat");
     if (infile.is_open())
     {
         string xx;
@@ -181,10 +181,10 @@ int main()
                 benc[i][bc+3].y=bone[i][j].y-benc[i][bc+1].y+bone[i][j].y;
                 benc[i][bc+3].z=bone[i][j].z-benc[i][bc+1].z+bone[i][j].z;
 
-                benc[i][bc].type=5;
-                benc[i][bc+1].type=5;
-                benc[i][bc+2].type=5;
-                benc[i][bc+3].type=5;
+                benc[i][bc].type=9;
+                benc[i][bc+1].type=9;
+                benc[i][bc+2].type=9;
+                benc[i][bc+3].type=9;
                 bc+=4;
 
                 natom+=3;
@@ -230,7 +230,7 @@ int main()
                 benc[i][bc].x=xb;
                 benc[i][bc].y=yb;
                 benc[i][bc].z=zb;
-                benc[i][bc].type=6;
+                benc[i][bc].type=38;
                 bc++;
 
                 natom++;
@@ -248,16 +248,22 @@ int main()
     // outfile<<dihedrals<<"       dihedrals"<<endl;
     // outfile<<impropers<<"       impropers"<<endl;
 
-    outfile<<" 6 atom types"<<endl;
-    outfile<<" 4 bond types"<<endl;
-    outfile<<" 3 angle types"<<endl;
+    outfile<<" 107 atom types"<<endl;
+    outfile<<" 1176 bond types"<<endl;
+    outfile<<" 30 angle types"<<endl;
 
     outfile<<endl;
     outfile<<xlo<<"     "<<xhi<<"       xlo     xhi"<<endl;
     outfile<<ylo<<"     "<<yhi<<"       ylo     yhi"<<endl;
-    outfile<<zlo<<"     "<<zhi<<"       zlo     zhi"<<endl;
+    outfile<<zlo<<"     "<<zhi<<"       zlo     zhi"<<endl<<endl;
     
-
+    ifstream inmass("dreiding-masses.txt");
+    string line;
+    while(getline(inmass,line))
+    {
+        outfile<<line<<endl;
+    }
+    inmass.close();
 
     outfile<<endl<<"Atoms # molecular"<<endl<<endl;
     long int count=0;
@@ -265,16 +271,16 @@ int main()
     {
         int pos=1;
         //outfile<<endl<<chain_len[i]<<endl;
-        for(int j=1;j<=chain_len[i]+1;j++)
+        for(int j=1;j<=chain_len[i];j++)
         {
             
             int k=bone[i][j].type;
-            if (k==1)
+            if (k==35)
             {
                 outfile<<++count<<"       "<<i<<"       "<<bone[i][j].type<<"     "<<bone[i][j].x<<"      "<<bone[i][j].y<<"      "<<bone[i][j].z<<endl;
                 bone[i][j].id=count;
             }
-            else if (k==2)
+            else if (k==8)
             {
                 outfile<<++count<<"       "<<i<<"       "<<bone[i][j].type<<"       "<<bone[i][j].x<<"      "<<bone[i][j].y<<"      "<<bone[i][j].z<<endl;
                 bone[i][j].id=count;
@@ -283,12 +289,12 @@ int main()
             {
                 for(int t=0;t<4;t++)
                 {
-                    outfile<<++count<<"     "<<i<<"     "<<benc[i][pos+t].type<<"       "<<benc[i][pos+t].x<<"      "<<benc[i][pos+t].y<<"      "<<benc[i][pos+t].z<<endl;
+                    outfile<<++count<<"     "<<i<<"    "<<benc[i][pos+t].type<<"       "<<benc[i][pos+t].x<<"      "<<benc[i][pos+t].y<<"      "<<benc[i][pos+t].z<<endl;
                     benc[i][pos+t].id=count;
                 }
                 pos+=4;
             }
-            else if (k==4)
+            else if (k==12)
             {   
                 outfile<<++count<<"       "<<i<<"       "<<bone[i][j].type<<"       "<<bone[i][j].x<<"      "<<bone[i][j].y<<"      "<<bone[i][j].z<<endl;
                 bone[i][j].id=count;
@@ -314,32 +320,32 @@ int main()
             
             if (j%8==0 && j!=chain_len[i])
             {
-                outfile<<++count<<"     "<<"1"<<"       "<<bone[i][j].id<<"        "<<bone[i][j+1].id<<endl;       // C-O
+                outfile<<++count<<"     "<<"456"<<"       "<<bone[i][j].id<<"        "<<bone[i][j+1].id<<endl;       // C-O
             }
             else if (j%8==1)
             {
-                outfile<<++count<<"     "<<"1"<<"       "<<bone[i][j].id<<"        "<<bone[i][j+1].id<<endl;       // O-C
+                outfile<<++count<<"     "<<"456"<<"       "<<bone[i][j].id<<"        "<<bone[i][j+1].id<<endl;       // O-C
             }
             else if (j%8==2 || j%8==6)
             {
-                outfile<<++count<<"     "<<"2"<<"       "<<bone[i][j].id<<"        "<<benc[i][++pos].id<<endl;     // C-C (benzene)
-                outfile<<++count<<"     "<<"2"<<"       "<<bone[i][j].id<<"        "<<benc[i][++pos].id<<endl;
-                outfile<<++count<<"     "<<"2"<<"       "<<benc[i][pos-1].id<<"        "<<benc[i][pos+2].id<<endl;
-                outfile<<++count<<"     "<<"2"<<"       "<<benc[i][pos].id<<"        "<<benc[i][++pos].id<<endl;
-                outfile<<++count<<"     "<<"2"<<"       "<<benc[i][pos].id<<"        "<<bone[i][j+2].id<<endl;
-                outfile<<++count<<"     "<<"2"<<"       "<<benc[i][++pos].id<<"        "<<bone[i][j+2].id<<endl;
+                outfile<<++count<<"     "<<"231"<<"       "<<bone[i][j].id<<"        "<<benc[i][++pos].id<<endl;     // C-C (benzene)
+                outfile<<++count<<"     "<<"231"<<"       "<<bone[i][j].id<<"        "<<benc[i][++pos].id<<endl;
+                outfile<<++count<<"     "<<"231"<<"       "<<benc[i][pos-1].id<<"        "<<benc[i][pos+2].id<<endl;
+                outfile<<++count<<"     "<<"231"<<"       "<<benc[i][pos].id<<"        "<<benc[i][++pos].id<<endl;
+                outfile<<++count<<"     "<<"231"<<"       "<<benc[i][pos].id<<"        "<<bone[i][j+2].id<<endl;
+                outfile<<++count<<"     "<<"231"<<"       "<<benc[i][++pos].id<<"        "<<bone[i][j+2].id<<endl;
                 j++;
             }
             else if (j%8==4)
             {
                 // outfile<<++count<<"     "<<"2"<<"       "<<benc[i][pos-1].id<<"         "<<bone[i][j].id<<endl;
                 // outfile<<++count<<"     "<<"2"<<"       "<<benc[i][pos].id<<"       "<<bone[i][j].id<<endl;
-                outfile<<++count<<"     "<<"3"<<"       "<<bone[i][j].id<<"        "<<bone[i][j+1].id<<endl;       // C-C
+                outfile<<++count<<"     "<<"213"<<"       "<<bone[i][j].id<<"        "<<bone[i][j+1].id<<endl;       // C-C
             }
             else if (j%8==5)
             {
-                outfile<<++count<<"     "<<"4"<<"       "<<bone[i][j].id<<"        "<<benc[i][++pos].id<<endl;     // C=O
-                outfile<<++count<<"     "<<"3"<<"       "<<bone[i][j].id<<"        "<<bone[i][j+1].id<<endl;       // C-C
+                outfile<<++count<<"     "<<"499"<<"       "<<bone[i][j].id<<"        "<<benc[i][++pos].id<<endl;     // C=O
+                outfile<<++count<<"     "<<"213"<<"       "<<bone[i][j].id<<"        "<<bone[i][j+1].id<<endl;       // C-C
             }
 
 
@@ -356,22 +362,22 @@ int main()
         {
             if( j%8 == 0  &&  j != chain_len[i] )
             {
-                outfile<<++count<<"     "<<"3"<<"       "<<bone[i][j].id<<"         "<<bone[i][j+1].id<<"       "<<bone[i][j+2].id<<endl;
+                outfile<<++count<<"     "<<"7"<<"       "<<bone[i][j].id<<"         "<<bone[i][j+1].id<<"       "<<bone[i][j+2].id<<endl;
             }
             else if(j%8==2 || j%8==6)
             {
-                outfile<<++count<<"     "<<"1"<<"       "<<bone[i][j-1].id<<"         "<<bone[i][j].id<<"       "<<benc[i][++pos].id<<endl;
-                outfile<<++count<<"     "<<"1"<<"       "<<bone[i][j-1].id<<"         "<<bone[i][j].id<<"       "<<benc[i][pos+1].id<<endl;
-                outfile<<++count<<"     "<<"1"<<"       "<<benc[i][pos].id<<"         "<<bone[i][j].id<<"       "<<benc[i][pos+1].id<<endl;
-                outfile<<++count<<"     "<<"1"<<"       "<<bone[i][j].id<<"         "<<benc[i][pos].id<<"       "<<benc[i][pos+3].id<<endl;
-                outfile<<++count<<"     "<<"1"<<"       "<<bone[i][j].id<<"         "<<benc[i][pos+1].id<<"       "<<benc[i][pos+2].id<<endl;
-                outfile<<++count<<"     "<<"1"<<"       "<<benc[i][pos].id<<"         "<<benc[i][pos+3].id<<"       "<<bone[i][j+2].id<<endl;
-                outfile<<++count<<"     "<<"1"<<"       "<<benc[i][pos+1].id<<"         "<<benc[i][pos+2].id<<"       "<<bone[i][j+2].id<<endl;
-                outfile<<++count<<"     "<<"1"<<"       "<<benc[i][pos+3].id<<"         "<<bone[i][j+2].id<<"       "<<benc[i][pos+3].id<<endl;
+                outfile<<++count<<"     "<<"30"<<"       "<<bone[i][j-1].id<<"         "<<bone[i][j].id<<"       "<<benc[i][++pos].id<<endl;
+                outfile<<++count<<"     "<<"30"<<"       "<<bone[i][j-1].id<<"         "<<bone[i][j].id<<"       "<<benc[i][pos+1].id<<endl;
+                outfile<<++count<<"     "<<"30"<<"       "<<benc[i][pos].id<<"         "<<bone[i][j].id<<"       "<<benc[i][pos+1].id<<endl;
+                outfile<<++count<<"     "<<"30"<<"       "<<bone[i][j].id<<"         "<<benc[i][pos].id<<"       "<<benc[i][pos+3].id<<endl;
+                outfile<<++count<<"     "<<"30"<<"       "<<bone[i][j].id<<"         "<<benc[i][pos+1].id<<"       "<<benc[i][pos+2].id<<endl;
+                outfile<<++count<<"     "<<"30"<<"       "<<benc[i][pos].id<<"         "<<benc[i][pos+3].id<<"       "<<bone[i][j+2].id<<endl;
+                outfile<<++count<<"     "<<"30"<<"       "<<benc[i][pos+1].id<<"         "<<benc[i][pos+2].id<<"       "<<bone[i][j+2].id<<endl;
+                outfile<<++count<<"     "<<"30"<<"       "<<benc[i][pos+3].id<<"         "<<bone[i][j+2].id<<"       "<<benc[i][pos+2].id<<endl;
                 if(j!=chain_len[i]-2)
                 {
-                    outfile<<++count<<"     "<<"1"<<"       "<<benc[i][pos+3].id<<"         "<<bone[i][j+2].id<<"       "<<bone[i][j+3].id<<endl;
-                    outfile<<++count<<"     "<<"1"<<"       "<<benc[i][pos+1].id<<"         "<<bone[i][j+2].id<<"       "<<bone[i][j+3].id<<endl;
+                    outfile<<++count<<"     "<<"30"<<"       "<<benc[i][pos+3].id<<"         "<<bone[i][j+2].id<<"       "<<bone[i][j+3].id<<endl;
+                    outfile<<++count<<"     "<<"30"<<"       "<<benc[i][pos+1].id<<"         "<<bone[i][j+2].id<<"       "<<bone[i][j+3].id<<endl;
                 }
                 
                 j+=1;
@@ -379,9 +385,9 @@ int main()
             }
             else if (j%8==5)
             {
-                outfile<<++count<<"     "<<"2"<<"       "<<bone[i][j-1].id<<"         "<<bone[i][j].id<<"       "<<bone[i][j+1].id<<endl;
-                outfile<<++count<<"     "<<"2"<<"       "<<bone[i][j-1].id<<"         "<<bone[i][j].id<<"       "<<benc[i][++pos].id<<endl;
-                outfile<<++count<<"     "<<"2"<<"       "<<bone[i][j+1].id<<"         "<<bone[i][j].id<<"       "<<benc[i][pos].id<<endl;
+                outfile<<++count<<"     "<<"28"<<"       "<<bone[i][j-1].id<<"         "<<bone[i][j].id<<"       "<<bone[i][j+1].id<<endl;
+                outfile<<++count<<"     "<<"28"<<"       "<<bone[i][j-1].id<<"         "<<bone[i][j].id<<"       "<<benc[i][++pos].id<<endl;
+                outfile<<++count<<"     "<<"28"<<"       "<<bone[i][j+1].id<<"         "<<bone[i][j].id<<"       "<<benc[i][pos].id<<endl;
             }
         }
     }
