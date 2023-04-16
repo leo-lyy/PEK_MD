@@ -43,7 +43,7 @@ int main()
     double vecx,vecy,vecz,mx,my,mz;
     //read initial data from "xxx.dat"
     memset(chain_len,0,sizeof(chain_len));
-    ifstream infile("skeleton.dat");
+    ifstream infile("PEEKK-skeleton.dat");
     if (infile.is_open())
     {
         string xx;
@@ -78,12 +78,12 @@ int main()
             }
             infile>>bone[k][molatom].type>>bone[k][molatom].x>>bone[k][molatom].y>>bone[k][molatom].z;
             chain_len[k]++;
-            if(molatom%8==0)
+            if(molatom%16==0)
             {
-                bonds+=17;
-                angles+=24;
-                dihedrals+=32;
-                impropers+=5;
+                bonds+=34;
+                angles+=48;
+                dihedrals+=64;
+                impropers+=10;
             }
             
             //if(bone[k][molatom].type==3)natom--;
@@ -108,7 +108,7 @@ int main()
         for (int j=1;j<=chain_len[i];j++)
         {
             k++;
-            if (j%8==3 || j%8==7) //遍历到苯环中心虚拟原子
+            if (j%16==3 || j%16==7 || j%16==11 || j%16==15) //遍历到苯环中心虚拟原子
             {
                 
                 //获得苯环头原子到虚拟原子的方向矢量
@@ -189,7 +189,7 @@ int main()
 
                 natom+=3;
             }
-            else if(j%8==5) //遍历到C=O, 生成羰基上的氧原子
+            else if(j%16==9||j%16==13) //遍历到C=O, 生成羰基上的氧原子
             {
                 // 利用上述生成苯环碳原子类似的方法
 
@@ -243,7 +243,7 @@ int main()
     outfile<<"# LAMMPS input data file"<<endl; 
     outfile<<natom<<"       atoms"<<endl;
     outfile<<bonds<<"       bonds"<<endl;
-    outfile<<angles<<"      angles"<<endl;
+    outfile<<angles<<"       angles"<<endl;
     outfile<<dihedrals<<"       dihedrals"<<endl;
     outfile<<impropers<<"       impropers"<<endl;
 
@@ -320,15 +320,15 @@ int main()
         for(int j=1;j<=chain_len[i];j++)
         {
             
-            if (j%8==0 && j!=chain_len[i])
+            if ((j%16==0 || j%16==4) && j!=chain_len[i])
             {
                 outfile<<++count<<"     "<<"456"<<"       "<<bone[i][j].id<<"     "<<bone[i][j+1].id<<endl;       // C-O
             }
-            else if (j%8==1)
+            else if (j%16==1 || j%16==5)
             {
                 outfile<<++count<<"     "<<"456"<<"       "<<bone[i][j].id<<"     "<<bone[i][j+1].id<<endl;       // O-C
             }
-            else if (j%8==2 || j%8==6)
+            else if (j%16==2 || j%16==6 || j%16==10 || j%16==14 )
             {
                 outfile<<++count<<"     "<<"231"<<"       "<<bone[i][j].id<<"     "<<benc[i][++pos].id<<endl;     // C-C (benzene)
                 outfile<<++count<<"     "<<"231"<<"       "<<bone[i][j].id<<"     "<<benc[i][++pos].id<<endl;
@@ -338,13 +338,13 @@ int main()
                 outfile<<++count<<"     "<<"231"<<"       "<<benc[i][++pos].id<<"     "<<bone[i][j+2].id<<endl;
                 j++;
             }
-            else if (j%8==4)
+            else if (j%16==8||j%16==12 )
             {
                 // outfile<<++count<<"     "<<"2"<<"       "<<benc[i][pos-1].id<<"         "<<bone[i][j].id<<endl;
                 // outfile<<++count<<"     "<<"2"<<"       "<<benc[i][pos].id<<"       "<<bone[i][j].id<<endl;
                 outfile<<++count<<"     "<<"213"<<"       "<<bone[i][j].id<<"     "<<bone[i][j+1].id<<endl;       // C-C
             }
-            else if (j%8==5)
+            else if (j%16==9 || j%16==13)
             {
                 outfile<<++count<<"     "<<"499"<<"       "<<bone[i][j].id<<"     "<<benc[i][++pos].id<<endl;     // C=O
                 outfile<<++count<<"     "<<"213"<<"       "<<bone[i][j].id<<"     "<<bone[i][j+1].id<<endl;       // C-C
@@ -362,11 +362,11 @@ int main()
         int pos=0;
         for(int j=1;j<=chain_len[i];j++)
         {
-            if( j%8 == 0  &&  j != chain_len[i] )
+            if( (j%16 == 0 ||j%16 == 4) &&  j != chain_len[i] )
             {
                 outfile<<++count<<"     "<<"7"<<"       "<<bone[i][j].id<<"         "<<bone[i][j+1].id<<"       "<<bone[i][j+2].id<<endl;
             }
-            else if(j%8==2 || j%8==6)
+            else if(j%16==2 || j%16==6 || j%16==10 || j%16==14)
             {
                 outfile<<++count<<"     "<<"30"<<"       "<<bone[i][j-1].id<<"         "<<bone[i][j].id<<"       "<<benc[i][++pos].id<<endl;
                 outfile<<++count<<"     "<<"30"<<"       "<<bone[i][j-1].id<<"         "<<bone[i][j].id<<"       "<<benc[i][pos+1].id<<endl;
@@ -385,7 +385,7 @@ int main()
                 j+=1;
                 pos+=3;
             }
-            else if (j%8==5)
+            else if (j%16==9 || j%16==13 )
             {
                 outfile<<++count<<"     "<<"28"<<"       "<<bone[i][j-1].id<<"         "<<bone[i][j].id<<"       "<<bone[i][j+1].id<<endl;
                 outfile<<++count<<"     "<<"28"<<"       "<<bone[i][j-1].id<<"         "<<bone[i][j].id<<"       "<<benc[i][++pos].id<<endl;
@@ -402,14 +402,14 @@ int main()
         for(int j=1;j<=chain_len[i];j++)
         {   
             
-            if(j%8==0 && j!=chain_len[i])
+            if((j%16==0 || j%16==4)&& j!=chain_len[i])
             {
                 outfile<<++count<<"     "<<"1930"<<"     "<<benc[i][pos].id<<"       "<<bone[i][j].id<<"     "<<bone[i][j+1].id<<"       "<<bone[i][j+2].id<<endl;
                 outfile<<++count<<"     "<<"1930"<<"     "<<benc[i][pos-1].id<<"       "<<bone[i][j].id<<"     "<<bone[i][j+1].id<<"       "<<bone[i][j+2].id<<endl;
                 outfile<<++count<<"     "<<"1930"<<"     "<<benc[i][pos+1].id<<"       "<<bone[i][j+2].id<<"     "<<bone[i][j+1].id<<"       "<<bone[i][j].id<<endl;
                 outfile<<++count<<"     "<<"1930"<<"     "<<benc[i][pos+2].id<<"       "<<bone[i][j+2].id<<"     "<<bone[i][j+1].id<<"       "<<bone[i][j].id<<endl;
             }
-            else if (j%8==1 ||j%8==5)
+            else if (j%16==1 ||j%16==5 ||j%16==9 ||j%16==13)
             {
                 pos++;
                 outfile<<++count<<"     "<<"1054"<<"     "<<bone[i][j].id<<"     "<<bone[i][j+1].id<<"     "<<benc[i][pos].id<<"     "<<benc[i][pos+3].id<<endl;
@@ -432,7 +432,7 @@ int main()
                     outfile<<++count<<"     "<<"1054"<<"     "<<benc[i][pos+1].id<<"     "<<benc[i][pos+2].id<<"     "<<bone[i][j+2].id<<"     "<<bone[i][j+3].id<<endl;
                 }
                 pos+=3;
-                if (j%8==2)
+                if (j%16==6 ||j%16==10)
                 {
                     ////keton
                     pos++;
@@ -451,7 +451,7 @@ int main()
                     
 
                 }
-                else if(j%8==6)
+                else if(j%16==2 ||j%16==14)
                 {
                     j++;
                 }
@@ -467,15 +467,15 @@ int main()
         int pos=0;
         for(int j=1;j<=chain_len[i];j++)
         {
-            if(j%8==2 || j%8==6)
+            if(j%16==2 || j%16==6 || j%16==10 || j%16==14)
             {
                 outfile<<++count<<"     "<<"2"<<"       "<<bone[i][j].id<<"     "<<bone[i][j-1].id<<"       "<<benc[i][++pos].id<<"     "<<benc[i][++pos].id<<endl;
             }
-            else if(j%4==0 && j!=chain_len[i])
+            else if((j%16==0 || j%16==4 || j%16==8 || j%16==12) && j!=chain_len[i])
             {
                 outfile<<++count<<"     "<<"2"<<"       "<<bone[i][j].id<<"     "<<bone[i][j+1].id<<"       "<<benc[i][++pos].id<<"     "<<benc[i][++pos].id<<endl;
             }
-            else if(j%8==5)
+            else if(j%16==9 || j%16==13)
             {
                 outfile<<++count<<"     "<<"1"<<"       "<<bone[i][j].id<<"     "<<bone[i][j-1].id<<"       "<<bone[i][j+1].id<<"      "<<benc[i][++pos].id<<endl;
             }

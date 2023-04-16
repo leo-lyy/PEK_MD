@@ -473,28 +473,28 @@ int main()
             ry[i]=0;
             rz[i]=0;
             int t=i+1;
-            if (t%8==1)bone[n][i].type=35;  //sp3_O
+            if (t%16==1 || t%16==5)bone[n][i].type=35;  //sp3_O
             if (t%2==0)bone[n][i].type=8;   //C_R
-            if (t%8==3||t%8==7)bone[n][i].type=3;
-            if (t%8==5)bone[n][i].type=12;  //C_2
+            if (t%16==3 || t%16==7 || t%16==11 || t%16==15)bone[n][i].type=3;
+            if (t%16==9 || t%16==13)bone[n][i].type=12;  //C_2
 
-            // if(t%8==1||i%8==3||i%8==5||i%8==7)bone[n][i].type=1;
-            // else if(i%8==2||i%8==6)bone[n][i].type=2;
-            // else if(i%8==0)bone[n][i].type=3;
-            // else bone[n][i].type=4;
+            // if (t%16==1 || t%16==5)bone[n][i].type=1;
+            // if (t%2==0 )bone[n][i].type=2;
+            // if (t%16==3 || t%16==7 || t%16==11 || t%16==15)bone[n][i].type=3;
+            // if (t%16==9 || t%16==13) bone[n][i].type=4;
         }
     }
 
 
 
  //-----------生成链的实际位置---------
-    freopen("skeleton.dat","w",stdout);
+    freopen("PEEKK-skeleton.dat","w",stdout);
     cout<<"# LAMMPS input data file"<<"     "<<tcount<<endl;
     cout<<natom<<"  "<<"atoms"<<endl;
     cout<<bonds<<" "<<"bonds"<<endl;//加和 每条链的长度减一
     cout<<angles<<" "<<"angles"<<endl;
     cout<<dihedrals<<" "<<"dihedrals"<<endl;
-    cout<<endl<<"107     atom types"<<endl<<"1176     bond types"<<endl<<"30     angle types"<<endl<<"17576     dihedral types"<<endl;
+    cout<<endl<<"4     atom types"<<endl<<"1     bond types"<<endl<<"1     angle types"<<endl<<"1     dihedral types"<<endl;
     // cout<<"0"<<"    "<<a*1.082<<" xlo xhi"<<endl;
     // cout<<"0"<<"    "<<b*1.082<<" ylo yhi"<<endl;
     // cout<<"0"<<"    "<<c*1.082<<" zlo zhi"<<endl;
